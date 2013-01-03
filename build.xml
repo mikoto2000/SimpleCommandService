@@ -42,11 +42,12 @@
 
     <!-- test project -->
     <property name="test.project" value="${project}Test" />
-    <property name="test.target" value="jp.dip.oyasirazu.SimpleCommandService.command.AllTests" />
+    <property name="test.target" value="jp.dip.oyasirazu.service.AllTests" />
     <property name="test.src" value="${test.project}/src" />
     <property name="test.classes" value="${test.project}/bin/classes" />
     <property name="junit4.jar" value="/usr/share/java/junit4.jar" />
     <path id="test.classpath">
+        <pathelement location="${command.jar}" />
         <pathelement location="${build.classes}" />
         <pathelement location="${test.classes}" />
         <pathelement location="${junit4.jar}" />
@@ -92,9 +93,20 @@
     </target>
 
     <!-- create aar -->
-    <target name="jar" depends="compile">
-        <jar jarfile="${jar.dest}" basedir="${build.classes}">
-        </jar>
+    <property name="tmpdir" value="${project}/aartmp" />
+    <property name="tmpmeta" value="${tmpdir}/META-INF" />
+    <target name="aar" depends="compile">
+        <!-- create tmp dir-->
+        <mkdir dir="${tmpdir}" />
+        <!-- copy need files to  tmp dir -->
+        <copy file="${project}/META-INF/services.xml" todir="${tmpmeta}" />
+        <copy todir="${tmpdir}">
+            <fileset dir="${build.bin}" />
+        </copy>
+        <!-- create aar -->
+        <jar jarfile="${aar.dest}" basedir="${tmpdir}" />
+        <!-- delete tmp dir -->
+        <delete dir="${tmpdir}" />
     </target>
 
     <!-- compile test-->
@@ -121,5 +133,6 @@
         <delete dir="${stub.dest}" />
         <delete dir="${javadoc.dest}" />
         <delete dir="${test.bin}" />
+        <delete file="${aar.dest}" />
     </target>
 </project>
